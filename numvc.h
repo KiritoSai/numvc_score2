@@ -1,7 +1,9 @@
 #include "my_heap.h"
+#include <vector>
 
 /* functions declaration */
 int build_instance(char *filename);
+int build_instance(const vector<vector<long>> &adjacency_matrix);
 void init_sol();
 void cover_LS();
 void add(int v);
@@ -118,6 +120,88 @@ int build_instance(char *filename)
 
 }
 
+int build_instance(const vector<vector<long>> &adjacency_matrix) {
+	int v,e;
+
+	int	v1,v2;
+
+	if (adjacency_matrix.size() == 1) {
+#ifndef NDEBUG
+		cout << "the simplified_graph is empty" << endl;
+#endif
+		return 0;
+	}
+
+	/*** build problem data structures of the instance ***/
+	v_num = adjacency_matrix.size() - 1;
+
+	e_num = 0;
+	for (vector<vector<long>>::size_type v = 1; v < adjacency_matrix.size(); ++v) {
+		e_num += adjacency_matrix[v].size();
+	}
+	e_num /= 2;
+
+	edge = new Edge [e_num];						//be initialized here
+	edge_weight = new int [e_num];					//be initialized in init_sol()
+	uncov_stack = new int [e_num];				//only need to initialized uncov_stack_fill_pointer, has been done in init_sol()
+	index_in_uncov_stack = new int [e_num];     //the same as above
+	dscore = new int [v_num + 1];					//be initialized in init_sol()
+	time_stamp = new long long [v_num + 1];			//be initialized in init_sol()
+	v_edges = new int* [v_num + 1];					//be initialized here
+	v_adj = new int* [v_num + 1];                   //the same as above
+	v_edge_count = new int [v_num + 1];				//be initialized here
+	v_in_c = new int [v_num + 1];					//be initialized in init_sol()
+	tmp_v_in_c = new int [v_num + 1];				//be initialized in init_sol()
+	remove_cand = new int [v_num + 1];              //be initialized in reset_remove_cand() in init_sol()
+	index_in_remove_cand = new int [v_num + 1];     //the same as above
+	best_v_in_c = new int [v_num + 1];				//be initialized in update_best_sol() in init_sol()
+	conf_change = new int [v_num + 1];				//be initializede int init_sol()
+
+	my_heap = new int [v_num + 1];
+	pos_in_my_heap = new int [v_num + 1];
+	my_heap_count = 0;
+
+	/* read edges and compute v_edge_count */
+	for (vector<vector<long>>::size_type v = 1, e = 0; v < adjacency_matrix.size(); ++v) {
+		v_edge_count[v] = adjacency_matrix[v].size();
+		for (auto u : adjacency_matrix[v]) {
+			if (v < (vector<vector<long>>::size_type)u) {
+				edge[e].v1 = v;
+				edge[e].v2 = u;
+				++e;
+			}
+		}
+	}
+
+	/* build v_adj and v_edges arrays */
+	for (v=1; v<=v_num; v++)
+	{
+		v_adj[v] = new int[v_edge_count[v]];
+		v_edges[v] = new int[v_edge_count[v]];
+	}
+
+	int* v_edge_count_tmp = new int [v_num + 1];
+	for(v=1; v<=v_num; v++)
+		v_edge_count_tmp[v]=0;
+	for (e=0; e<e_num; e++)
+	{
+
+		v1=edge[e].v1;
+		v2=edge[e].v2;
+
+		v_edges[v1][v_edge_count_tmp[v1]] = e;
+		v_edges[v2][v_edge_count_tmp[v2]] = e;
+
+		v_adj[v1][v_edge_count_tmp[v1]] = v2;
+		v_adj[v2][v_edge_count_tmp[v2]] = v1;
+
+		v_edge_count_tmp[v1]++;
+		v_edge_count_tmp[v2]++;
+	}
+	delete[] v_edge_count_tmp;
+
+	return 1;
+}
 
 void free_memory()
 {
@@ -141,7 +225,7 @@ void free_memory()
 	delete[] uncov_stack;
 	delete[] edge_weight;
 	delete[] edge;
-	
+
 	delete[] my_heap;
 	delete[] pos_in_my_heap;
 }
@@ -572,7 +656,7 @@ void init_sol_merge() {
 		edge_weight[e] = 1;
 	}
 
-	string who = "heap";
+	init_method = "heap";
 	//heap init
 	{
 		for (e=0; e<e_num; e++)
@@ -684,7 +768,7 @@ void init_sol_merge() {
 			for (int v = 1; v <= v_num; ++v) {
 				v_in_c[v] = tmp_v_in_c[v];
 			}
-			who = "edge";
+			init_method = "edge";
 		}
 	}
 
@@ -741,7 +825,7 @@ void init_sol_merge() {
 			for (int v = 1; v <= v_num; ++v) {
 				v_in_c[v] = tmp_v_in_c[v];
 			}
-			who = "match";
+			init_method = "match";
 		}
 	}
 	
@@ -764,12 +848,12 @@ void init_sol_merge() {
 
 	update_best_sol();
 
-	std::cout << who << std::endl;
-	times(&finish);
-	double init_sol_time = double(finish.tms_utime - start.tms_utime + finish.tms_stime - start.tms_stime)/sysconf(_SC_CLK_TCK);
-	init_sol_time = round(init_sol_time * 100)/100.0;
-	cout << "c initial solution size = " << c_size << endl;
-	cout << "c initial solution time = " << init_sol_time << endl;
+//	std::cout << "c initial method = " << init_method << std::endl;
+//	times(&finish);
+//	double init_sol_time = double(finish.tms_utime - start.tms_utime + finish.tms_stime - start.tms_stime)/sysconf(_SC_CLK_TCK);
+//	init_sol_time = round(init_sol_time * 100)/100.0;
+//	cout << "c initial solution size = " << c_size << endl;
+//	cout << "c initial solution time = " << init_sol_time << endl;
 	
 	reset_remove_cand();
 	

@@ -1,4 +1,5 @@
 #include "numvc.h"
+#include "preprocess.h"
 
 int try_step=100;
 
@@ -202,50 +203,89 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 	int seed;
-//	float scale_threshold;
 
-	if(build_instance(argv[1])!=1){
-		cout<<"can't open instance file"<<endl;
-		return -1;
+	//preprocessing
+	Preprocess preprocess(argv[1]);
+
+	times(&start);
+	start_time = start.tms_utime + start.tms_stime;
+
+	preprocess.dominate_simplify_v();
+
+	times(&finish);
+	double preprocess_time = double(finish.tms_utime + finish.tms_stime - start_time)/sysconf(_SC_CLK_TCK);
+	cout << "c preprocess time = " << preprocess_time << endl;
+	cout << "c fix_vertice size = " << preprocess.get_fix_vertices_size() << endl;
+	
+	//simplified_graph is empty
+	if(build_instance(preprocess.get_adjacency_matrix()) != 1){
+		times(&start);
+		start_time = start.tms_utime + start.tms_stime;
+		if (preprocess.verify((long*) 0, (long*) 0)) {
+			cout << "c initialize method = empty" << endl;
+			cout << "c initialize solution = " << preprocess.get_fix_vertices_size() << endl;
+			cout << "c initialize time = " << 0 << endl;
+			cout << "c Best found vertex cover size = " << preprocess.get_fix_vertices_size() << endl;
+			cout << "c searchSteps = " << best_step << endl;
+			cout << "c solvetime(includes preprocess time) = " << best_comp_time + preprocess_time << endl;
+		}
+		else {
+			cout<<"the solution is wrong."<<endl;
+		}
+		return 0;
 	}
+
 
 	sscanf(argv[2],"%d",&optimal_size);//if you want to stop the algorithm only cutoff time is reached, set optimal_size to 0.
 //	sscanf(argv[2], "%d", &cand_count);
 	sscanf(argv[3],"%d",&seed);
 	sscanf(argv[4],"%d",&cutoff_time);
+	cutoff_time -= preprocess_time;
 
 	threshold = (int)(0.5*v_num); 
 
 	srand(seed);
 
-//	cout<<seed<<' ';
-//	cout<<"c This is NuMVC, a local search solver for the Minimum Vertex Cover (and also Maximum Independent Set) problem."<<endl;
 
 	times(&start);
 	start_time = start.tms_utime + start.tms_stime;
 
 //	init_sol_edge_greedy();
 	init_sol_merge();
+	cout << "c initialize method = " << init_method << endl;
+	cout << "c initialize solution = " << best_c_size + preprocess.get_fix_vertices_size() << endl; 
+	cout << "c initialize time = " << best_comp_time << endl;
 	if(c_size + uncov_stack_fill_pointer > optimal_size ) 
 	{
-//		cout<<"c Start local search..."<<endl;
-//		cover_LS();
+		cover_LS();
 	}
 
 	//check solution
-	if(check_solution()==1)
-	{
-		cout<<"c Best found vertex cover size = "<<best_c_size<<endl;
-//		print_solution();
-		cout<<"c searchSteps = "<<best_step<<endl;
-		cout<<"c solveTime = "<<best_comp_time<<endl;
-
-//		cout<<best_c_size<<' '<<best_comp_time<<' '<<best_step<<endl;
+	long *solution = new long[best_c_size];
+	for (long i = 1, j = 0; i <= v_num; ++i) {
+		if (best_v_in_c[i] == 1) {
+			solution[j++] = i;
+		}
 	}
+	if (preprocess.verify(solution, solution + best_c_size)) {
+#ifndef NDEBUG
+		cout << "c vc: ";
+		preprocess.out_solution(solution, solution + best_c_size);
+#endif
+		cout << "c Best found vertex cover size = " << best_c_size + preprocess.get_fix_vertices_size() << endl;
+		cout << "c searchSteps = " << best_step << endl;
+		cout << "c solvetime(includes preprocess time) = " << best_comp_time + preprocess_time << endl;
+	}
+//	//check solution
+//	if(check_solution()==1)
+//	{
+//		cout<<"c Best found vertex cover size = "<<best_c_size<<endl;
+//		cout<<"c searchSteps = "<<best_step<<endl;
+//		cout<<"c solveTime = "<<best_comp_time<<endl;
+//	}
 	else
 	{
 		cout<<"the solution is wrong."<<endl;
-//		print_solution();
 	}
 
 	free_memory();

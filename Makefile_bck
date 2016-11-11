@@ -1,0 +1,2 @@
+numvc: numvc.cpp numvc.h
+	g++ numvc.cpp -std=c++11 -O3 -o numvc

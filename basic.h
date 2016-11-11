@@ -110,3 +110,4 @@ int		delta_total_weight=0;
 int		threshold;
 float	p_scale=0.3;//w=w*p
 
+string init_method;
