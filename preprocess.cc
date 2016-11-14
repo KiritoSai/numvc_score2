@@ -3,6 +3,7 @@
 using namespace std;
 Preprocess::Preprocess(string origin_graph_filename) : origin_graph_filename(origin_graph_filename) {
 	initialize(origin_graph_filename);
+//	degree_1_count = degree_2_count = dominate_count = all_count = 0;
 #ifndef NDEBUG
 	print();
 #endif
@@ -42,10 +43,10 @@ void Preprocess::initialize(string origin_graph_filename) {
 }
 
 void Preprocess::simplify() {
-	pending_vertice.clear();
-	for (vector<vector<long>>::size_type i = 1; i < adjacency_matrix.size(); ++i) {
-		if (adjacency_matrix[i].size() == 1 || adjacency_matrix[i].size() == 2) {
-			pending_vertice.push_back(i);
+	std::vector<long> pending_vertice;
+	for (vector<vector<long>>::size_type v = 1; v < adjacency_matrix.size(); ++v) {
+		if (adjacency_matrix[v].size() == 1 || adjacency_matrix[v].size() == 2) {
+			pending_vertice.push_back(v);
 		}
 	}
 	while (pending_vertice.size() != 0) {
@@ -56,15 +57,20 @@ void Preprocess::simplify() {
 		if (degree == 1) {
 			long u = adjacency_matrix[processing_vertice][0];
 			fix_vertice.push_back(u);
-			fix(u);
+			fix(u, pending_vertice);
+//			degree_1_count++;
+//			all_count++;
 		}
 		else if (degree == 2) {
 			long u1 = adjacency_matrix[processing_vertice][0], u2 = adjacency_matrix[processing_vertice][1];
 			if (is_adjacent(u1, u2)) {
 				fix_vertice.push_back(u1); fix_vertice.push_back(u2);
-				fix(u1); fix(u2);
+				fix(u1, pending_vertice); fix(u2, pending_vertice);
+//				degree_2_count++;
+//				all_count++;
 			}
 		}
+
 	}
 //	rm_acnodes();
 //#ifndef NDEBUG
@@ -79,7 +85,7 @@ void Preprocess::simplify() {
 //	cout << "c simplified graph: p edge " << adjacency_matrix.size() - 1 << ' ' << edge_count << endl;
 }
 
-void Preprocess::fix(long v) {
+void Preprocess::fix(long v, vector<long> &pending_vertice) {
 	//decrease degree of neighbooring vertice, and update pending_vertice 
 	for (auto neighbor : adjacency_matrix[v]) {
 		vector<long>::size_type i = 0;
@@ -88,12 +94,12 @@ void Preprocess::fix(long v) {
 				break;
 			}
 		}
-		swap(adjacency_matrix[neighbor][i], *(adjacency_matrix[neighbor].end() - 1));
+		adjacency_matrix[neighbor][i] = *adjacency_matrix[neighbor].rbegin();
 		adjacency_matrix[neighbor].pop_back();
 
 		long degree = adjacency_matrix[neighbor].size();
-		if (degree == 1 || degree == 2) {
-			//one vertex may appear in pending_vertice twice
+		//degree == 1 is need, because of the case that neighor's degree == 2 but not subject to 2-degree-rule
+		if (degree == 1 ||degree == 2) {
 			pending_vertice.push_back(neighbor);
 		}
 	}
@@ -156,10 +162,13 @@ void Preprocess::dominate_simplify_v() {
 					for (auto w : adjacency_matrix[u]) {
 						if (addable[w]) {
 							next_working_vertice.push_back(w);
+							addable[w] = false;
 						}
 					}
 				}
 				adjacency_matrix[v].clear();
+//				dominate_count++;
+//				all_count++;
 			}
 			addable[v] = true;
 		}
@@ -172,6 +181,8 @@ void Preprocess::dominate_simplify_v() {
 #ifndef NDEBUG
 	print();
 #endif
+//	cout << degree_1_count << '\t' << degree_2_count << '\t' << dominate_count << '\t' << all_count << endl;
+//	return;
 
 	//output simplified_graph size
 	size_t edge_count = 0;

@@ -13,7 +13,6 @@ chmod a+x numvc
 CUTOFF_TIME=1000
 
 instance_dirs="bio col fb inf int rec ret sci soc tec web"
-#"bio col fb inf int rec ret sci soc tec web"
 
 all_results_dir=$1
 #"results_dir_rm"

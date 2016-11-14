@@ -29,17 +29,15 @@ public:
 	
 private:
 	void initialize(std::string origin_graph_file);
-	void fix(long v);
-	void fix_dominate(long v);
+	void fix(long v, std::vector<long> &pending_vertice);
 	void rm_acnodes();
 	bool is_adjacent(long v1, long v2);
 
 	std::string origin_graph_filename;
 	std::vector<std::vector<long>> adjacency_matrix;
-	std::vector<long> leaves_and_acnodes;
-	std::vector<long> pending_vertice;
 	std::vector<long> fix_vertice;
 	std::map<long, long> vertice_map;
+//	long long degree_1_count, degree_2_count, dominate_count, all_count;
 };
 
 template<typename ITERATOR>
