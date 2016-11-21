@@ -830,6 +830,10 @@ void init_sol_merge() {
 	}
 	
 	//calculate dscore
+	for (int v=1; v<=v_num; v++)
+	{
+		dscore[v] = 0;
+	}
 	for (int e=0; e<e_num; e++)
 	{
 		int v1 = edge[e].v1;
