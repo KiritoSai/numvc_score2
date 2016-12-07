@@ -23,7 +23,7 @@ then
 fi
 mkdir "$all_results_dir"
 
-for seed in `seq 2 2`
+for seed in `seq 1 10`
 do
 	echo "*************    $seed    *****************"
 	for dir in $instance_dirs
