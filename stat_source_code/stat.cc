@@ -169,10 +169,10 @@ int main() {
 				//init_method
 				getline(result_file, line);
 
-				//initialize time
+				//initialize solution
 				getline(result_file, line);
 
-				//initialize solution
+				//initialize time
 				getline(result_file, line);
 
 				//vertex cover size

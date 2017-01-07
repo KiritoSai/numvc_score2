@@ -25,3 +25,4 @@ Specially, if you want to terminate the solver only when reaching the cutoff tim
 
 true run:
 	./init_merge_p1-10 and ./init_merge_p1-10-3-10 and ./init_merge_p1-10-2
+	merge in init_merge_p_final
