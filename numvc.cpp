@@ -210,7 +210,7 @@ int main(int argc, char* argv[])
 	times(&start);
 	start_time = start.tms_utime + start.tms_stime;
 
-//	preprocess.dominate_simplify_v();
+	preprocess.dominate_simplify_v();
 
 	times(&finish);
 	double preprocess_time = double(finish.tms_utime + finish.tms_stime - start_time)/sysconf(_SC_CLK_TCK);
@@ -255,7 +255,7 @@ int main(int argc, char* argv[])
 	cout << "c initialize method = " << init_method << endl;
 	cout << "c initialize solution = " << best_c_size + preprocess.get_fix_vertices_size() << endl; 
 	cout << "c initialize time = " << best_comp_time << endl;
-	if(c_size + uncov_stack_fill_pointer > optimal_size ) 
+	if(c_size + uncov_stack_fill_pointer + preprocess.get_fix_vertices_size() > optimal_size ) 
 	{
 		cover_LS();
 	}

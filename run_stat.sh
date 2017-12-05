@@ -16,7 +16,7 @@ instance_dirs="bio col fb inf int rec ret sci soc tec web"
 
 all_results_dir=$1
 #"results_dir_rm"
-graph_dir="./realworld-graphs"
+graph_dir="../realworld-graphs"
 if [ -d "$all_results_dir" ]
 then
 	rm -r "$all_results_dir"
@@ -44,11 +44,14 @@ do
 					mkdir "$res_dir"
 				fi
 				res_file="$res_dir"/"$instance"_$seed
-				./numvc "$graph_dir/$dir/$instance" 0 $seed $CUTOFF_TIME > "$res_file"
+				./numvc "$graph_dir/$dir/$instance" 0 $seed $CUTOFF_TIME> "$res_file"
 				echo >&6
 			} &
 		done
 	done
 done
+cp ./stat $all_results_dir
+cd $all_results_dir
+./stat
 
 exit 0

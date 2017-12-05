@@ -658,132 +658,132 @@ void init_sol_merge() {
 
 	init_method = "heap";
 	//heap init
-	// {#<{(|{{{|)}>#
-	// 	for (e=0; e<e_num; e++)
-	// 	{
-	// 		dscore[edge[e].v1]+=edge_weight[e];
-	// 		dscore[edge[e].v2]+=edge_weight[e];
-	// 	}
-    //
-	// 	//init uncovered edge stack and cover_vertrex_count_of_edge array
-	// 	uncov_stack_fill_pointer = 0;
-    //
-	// 	int *best_array = new int [v_num + 1];
-	// 	for (e=0; e<e_num; e++)
-	// 		uncover(e);
-    //
-	// 	for(v=1; v<=v_num; v++)
-	// 	{
-	// 		my_heap_insert(v);
-	// 	}
-	// 	//cout<<my_heap_count<<endl;
-    //
-	// 	for(i=0; uncov_stack_fill_pointer>0; )
-	// 	{
-	// 		int best_v = my_heap[0];
-	// 		if(dscore[best_v]>0)
-	// 		{
-	// 			add_init(best_v);
-	// 			i++;
-	// 		}
-	// 	}
-    //
-	// 	delete[] best_array;
-    //
-	// 	c_size = i;
-    //
-	// 	//remove redundent vertices, all neighbor of each are not in heap
-	// 	for (int v=1; v<=v_num; v++)
-	// 	{
-	// 		if (v_in_c[v]==1 && dscore[v]==0) 
-	// 		{
-	// 			v_in_c[v] = 0;
-	// 			my_heap_insert(v);
-    //
-	// 			int edge_count = v_edge_count[v];
-	// 			for (int i=0; i<edge_count; ++i)
-	// 			{
-	// 				int e = v_edges[v][i];
-	// 				int n = v_adj[v][i];
-	// 				dscore[n] -= edge_weight[e];
-	// 			}
-	// 			c_size--;
-	// 		}
-	// 	}
-    //
-	// }#<{(|}}}|)}>#
-	// goto FINISH_INIT;
+	{
+		for (e=0; e<e_num; e++)
+		{
+			dscore[edge[e].v1]+=edge_weight[e];
+			dscore[edge[e].v2]+=edge_weight[e];
+		}
+    
+		//init uncovered edge stack and cover_vertrex_count_of_edge array
+		uncov_stack_fill_pointer = 0;
+    
+		int *best_array = new int [v_num + 1];
+		for (e=0; e<e_num; e++)
+			uncover(e);
+    
+		for(v=1; v<=v_num; v++)
+		{
+			my_heap_insert(v);
+		}
+		//cout<<my_heap_count<<endl;
+    
+		for(i=0; uncov_stack_fill_pointer>0; )
+		{
+			int best_v = my_heap[0];
+			if(dscore[best_v]>0)
+			{
+				add_init(best_v);
+				i++;
+			}
+		}
+    
+		delete[] best_array;
+    
+		c_size = i;
+    
+		//remove redundent vertices, all neighbor of each are not in heap
+		for (int v=1; v<=v_num; v++)
+		{
+			if (v_in_c[v]==1 && dscore[v]==0) 
+			{
+				v_in_c[v] = 0;
+				my_heap_insert(v);
+    
+				int edge_count = v_edge_count[v];
+				for (int i=0; i<edge_count; ++i)
+				{
+					int e = v_edges[v][i];
+					int n = v_adj[v][i];
+					dscore[n] -= edge_weight[e];
+				}
+				c_size--;
+			}
+		}
+    
+	}
+	//	goto FINISH_INIT;
 
-	//edge_greedy
-	// {#<{(|{{{|)}>#
-	// 	auto &tmp_v_in_c = v_in_c;
-	// 	auto &tmp_c_size = c_size;
-	// 	init_method = "edge";
-    //
-	// 	for (v=1; v<=v_num; v++)
-	// 	{
-	// 		dscore[v] = 0;
-	// 		tmp_v_in_c[v] = 0;
-	// 	}
-	// 	tmp_c_size = 0;
-	// 	for (int e = 0; e < e_num; e++) {
-	// 		int v1 = edge[e].v1;
-	// 		int v2 = edge[e].v2;
-    //
-	// 		if (tmp_v_in_c[v1] == 0 && tmp_v_in_c[v2] == 0) {
-	// 			if (v_edge_count[v1] > v_edge_count[v2]) {
-	// 				tmp_v_in_c[v1] = 1;
-	// 			}
-	// 			else {
-	// 				tmp_v_in_c[v2] = 1;
-	// 			}
-	// 			tmp_c_size++;
-	// 		}
-	// 	}
-    //
-	// 	for (int e=0; e<e_num; e++)
-	// 	{
-	// 		int v1 = edge[e].v1;
-	// 		int v2 = edge[e].v2;
-	// 		if (tmp_v_in_c[v1] == 1 && tmp_v_in_c[v2] == 0)
-	// 			dscore[v1] -= edge_weight[e];
-	// 		else if (tmp_v_in_c[v2]==1 && tmp_v_in_c[v1] == 0)
-	// 			dscore[v2] -= edge_weight[e];
-	// 	}
-    //
-	// 	//remove redundent vertices
-	// 	for (int v=1; v<=v_num; v++)
-	// 	{
-	// 		if (tmp_v_in_c[v]==1 && dscore[v]==0) 
-	// 		{
-	// 			tmp_v_in_c[v] = 0;
-    //
-	// 			int edge_count = v_edge_count[v];
-	// 			for (int i=0; i<edge_count; ++i)
-	// 			{
-	// 				int e = v_edges[v][i];
-	// 				int n = v_adj[v][i];
-	// 				dscore[n] -= edge_weight[e];
-	// 			}
-	// 			tmp_c_size--;
-	// 		}
-	// 	}
-    //
-	// 	// if (tmp_c_size < c_size) {
-	// 	// 	c_size = tmp_c_size;
-	// 	// 	for (int v = 1; v <= v_num; ++v) {
-	// 	// 		v_in_c[v] = tmp_v_in_c[v];
-	// 	// 	}
-	// 	// 	init_method = "edge";
-	// 	// }
-	// }#<{(|}}}|)}>#
+	//	edge_greedy
+	{
+	//	auto &tmp_v_in_c = v_in_c;
+	//	auto &tmp_c_size = c_size;
+	//	init_method = "edge";
+    
+		for (v=1; v<=v_num; v++)
+		{
+			dscore[v] = 0;
+			tmp_v_in_c[v] = 0;
+		}
+		tmp_c_size = 0;
+		for (int e = 0; e < e_num; e++) {
+			int v1 = edge[e].v1;
+			int v2 = edge[e].v2;
+    
+			if (tmp_v_in_c[v1] == 0 && tmp_v_in_c[v2] == 0) {
+				if (v_edge_count[v1] > v_edge_count[v2]) {
+					tmp_v_in_c[v1] = 1;
+				}
+				else {
+					tmp_v_in_c[v2] = 1;
+				}
+				tmp_c_size++;
+			}
+		}
+    
+		for (int e=0; e<e_num; e++)
+		{
+			int v1 = edge[e].v1;
+			int v2 = edge[e].v2;
+			if (tmp_v_in_c[v1] == 1 && tmp_v_in_c[v2] == 0)
+				dscore[v1] -= edge_weight[e];
+			else if (tmp_v_in_c[v2]==1 && tmp_v_in_c[v1] == 0)
+				dscore[v2] -= edge_weight[e];
+		}
+    
+		//remove redundent vertices
+		for (int v=1; v<=v_num; v++)
+		{
+			if (tmp_v_in_c[v]==1 && dscore[v]==0) 
+			{
+				tmp_v_in_c[v] = 0;
+    
+				int edge_count = v_edge_count[v];
+				for (int i=0; i<edge_count; ++i)
+				{
+					int e = v_edges[v][i];
+					int n = v_adj[v][i];
+					dscore[n] -= edge_weight[e];
+				}
+				tmp_c_size--;
+			}
+		}
+
+		if (tmp_c_size < c_size) {
+			c_size = tmp_c_size;
+			for (int v = 1; v <= v_num; ++v) {
+				v_in_c[v] = tmp_v_in_c[v];
+			}
+			init_method = "edge";
+		}
+	}
 	// goto FINISH_INIT;
 
 	//max match init
 	{
-		auto &tmp_v_in_c = v_in_c;
-		auto &tmp_c_size = c_size;
-		init_method = "match";
+//		auto &tmp_v_in_c = v_in_c;
+//		auto &tmp_c_size = c_size;
+//		init_method = "match";
 
 		for (int v=1; v<=v_num; v++)
 		{
@@ -831,15 +831,15 @@ void init_sol_merge() {
 			}
 		}
 
-		// if (tmp_c_size < c_size) {
-		// 	c_size = tmp_c_size;
-		// 	for (int v = 1; v <= v_num; ++v) {
-		// 		v_in_c[v] = tmp_v_in_c[v];
-		// 	}
-		// 	init_method = "match";
-		// }
+		 if (tmp_c_size < c_size) {
+		 	c_size = tmp_c_size;
+		 	for (int v = 1; v <= v_num; ++v) {
+		 		v_in_c[v] = tmp_v_in_c[v];
+		 	}
+		 	init_method = "match";
+		 }
 	}
-	goto FINISH_INIT;
+	//	goto FINISH_INIT;
 	
 	//calculate dscore
 	for (int v=1; v<=v_num; v++)
