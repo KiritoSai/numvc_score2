@@ -1,6 +1,6 @@
 # !/bin/bash
 all_results_dir="../result/"$1
-solution="../solution/"$1
+solution="../xls/"$1
 graph_dir="/mnt/data/dimacs"
 graph_list="../list/dimacs_hard_list"
 list_file=$(cat $graph_list)
@@ -14,7 +14,7 @@ for ((i=0;i<$SEND_THREAD_NUM;i++));do
 	echo # for循环 往 fifo管道文件中写入 $SEND_THREAD_NUM 个空行 
 done >&6 
 
-chmod a+x numvc
+chmod a+x ../bin/numvc
 CUTOFF_TIME=2000
 
 n=0
@@ -61,18 +61,23 @@ do
 
 done
 
-sleep CUTOFF_TIME
+sleep ${CUTOFF_TIME}
 suc=0
 avr_time=0
 sum_time=0
-rm ${solution}
+
+if [ -f "$solution" ]
+then
+    rm ${solution}
+fi
+touch $solution
 echo -e "graph\t\tsuc\ttime" >> $solution
 
 echo "****stat****"
 for j in "${!arr_g[@]}"
 do
     instance="${arr_g[$j]}"
-    echo -n "$instance" >> solution.xls
+    echo -n "$instance" >> $solution
     res_dir="$all_results_dir"/"$instance"
     if [ ! -d "$res_dir" ]
     then

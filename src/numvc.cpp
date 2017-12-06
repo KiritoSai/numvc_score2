@@ -221,7 +221,7 @@ int main(int argc, char* argv[])
 	times(&start);
 	start_time = start.tms_utime + start.tms_stime;
 
-	preprocess.dominate_simplify_v();
+	//	preprocess.dominate_simplify_v();
 
 	times(&finish);
 	double preprocess_time = double(finish.tms_utime + finish.tms_stime - start_time)/sysconf(_SC_CLK_TCK);

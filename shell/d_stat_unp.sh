@@ -52,12 +52,12 @@ do
 	    echo "no $res_file"
 	    exit 0
 	fi
-	vertex_size=$(awk 'NR==8 {print $NF}' $res_file)
+	vertex_size=$(awk 'NR==7 {print $NF}' $res_file)
 	echo $vertex_size
 	if [ ${vertex_size} -eq ${arr_o[$i]} ];then
 	    let suc++
 	fi
-	time=$(awk 'NR==10 {printf "%.2f", $NF}' $res_file)
+	time=$(awk 'NR==9 {printf "%.2f", $NF}' $res_file)
 	sum_time=$(gawk -v x=$time -v y=$sum_time 'BEGIN{printf "%.2f\n",x+y}')
     done < res_dir_list
     
