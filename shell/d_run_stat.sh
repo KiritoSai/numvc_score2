@@ -53,7 +53,7 @@ do
 		read -u6
 		{
 		    res_file="$res_dir"/"$instance"_$seed
-		    ./numvc "$graph_dir/$instance" ${arr_o[$i]} $seed $CUTOFF_TIME > "$res_file"
+		    ../bin/numvc "$graph_dir/$instance" ${arr_o[$i]} $seed $CUTOFF_TIME > "$res_file"
 		    echo >&6
 		} &
 
