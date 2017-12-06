@@ -1,9 +1,0 @@
-c origin graph: p edge 1112702 2278852
-c preprocess time = 0
-c fix_vertice size = 0
-c initialize method = heap
-c initialize solution = 81279
-c initialize time = 0.65
-c Best found vertex cover size = 81047
-c searchSteps = 9874
-c solvetime(includes preprocess time) = 2.99
